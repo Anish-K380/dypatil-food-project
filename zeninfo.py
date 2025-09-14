@@ -1,0 +1,54 @@
+import PyQt6.QtWidgets as qtw
+
+class MainWindow(qtw.QMainWindow):
+    def __init__(self):
+        super().__init__()
+        layout = qtw.QHBoxLayout() #master layout
+
+        layout1 = qtw.QVBoxLayout()  #contains buttons and open space
+        layout1_ = qtw.QVBoxLayout() #the empty space
+        button_layout = qtw.QVBoxLayout() #contains the buttons
+
+        layout2 = qtw.QStackedLayout() #will contain the content
+        '''layouta = qtw.QGridLayout()    #name, calories, age, quantity
+        layoutb = qtw.QVBoxLayout()    #nutrients, ingredients
+        layoutc = qtw.QVBoxLayout()    #body type, diet, best time to eat
+        layoutd = qtw.QGridLayout()    #diseases, allergies
+        layoute = qtw.QVBoxLayout()    #description of food'''
+
+        button_basic = qtw.QPushButton('basic')
+        button_contains = qtw.QPushButton('contains')
+        button_diet = qtw.QPushButton('diet')
+        button_disease = qtw.QPushButton('disease')
+        button_description = qtw.QPushButton('description')
+        button_exit = qtw.QPushButton('exit')
+
+        button_exit.clicked.connect(app.quit)
+
+        button_layout.addWidget(button_basic)
+        button_layout.addWidget(button_contains)
+        button_layout.addWidget(button_diet)
+        button_layout.addWidget(button_disease)
+        button_layout.addWidget(button_description)
+        button_layout.addWidget(button_exit)
+
+        layout1.addLayout(button_layout, stretch = 3)   #space taken by buttons in tabs bar
+        layout1.addLayout(layout1_, stretch = 1)
+
+        '''layout2.addLayout(layouta)
+        layout2.addLayout(layoutb)
+        layout2.addLayout(layoutc)
+        layout2.addLayout(layoutd)
+        layout2.addLayout(layoute)'''
+
+        layout.addLayout(layout1, stretch = 1)       #space taken by content and tab bar
+        layout.addLayout(layout2, stretch = 7)
+
+        widget = qtw.QWidget()
+        widget.setLayout(layout)
+        self.setCentralWidget(widget)
+
+app = qtw.QApplication([])
+window = MainWindow()
+window.show()
+app.exec()
