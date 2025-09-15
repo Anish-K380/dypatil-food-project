@@ -37,22 +37,35 @@ class MainWindow(qtw.QMainWindow):
         button_layout.addWidget(button_description)
         button_layout.addWidget(button_exit)
 
-        for i in range(13):layouta.addWidget(qtw.QWidget(), i, 0)
+        stack = (layouta, layoutb, layoutc, layoutd, layoute)
+
+        for i in range(5):
+            for j in range(13 + i):stack[i].addWidget(qtw.QWidget(), i, 0)
 
         layouta.addWidget(qtw.QLabel('<--'), 13, 0)
-        layouta.addWidget(qtw.QLabel('<--'), 14, 0)
-        layouta.addWidget(qtw.QLabel('<--'), 15, 0)
-        layouta.addWidget(qtw.QLabel('<--'), 16, 0)
-        layouta.addWidget(qtw.QLabel('<--'), 17, 0)
+        layoutb.addWidget(qtw.QLabel('<--'), 14, 0)
+        layoutc.addWidget(qtw.QLabel('<--'), 15, 0)
+        layoutd.addWidget(qtw.QLabel('<--'), 16, 0)
+        layoute.addWidget(qtw.QLabel('<--'), 17, 0)
 
-        for i in range(18, 32):layouta.addWidget(qtw.QWidget(), i, 0)
+        for i in range(5):
+            for j in range(14 + i, 32):stack[i].addWidget(qtw.QWidget(), i, 0)
         
         window_basic.setLayout(layouta)
+        window_contains.setLayout(layoutb)
+        window_diet.setLayout(layoutc)
+        window_desease.setLayout(layoutd)
+        window_description.setLayout(layoute)
+        button_basic.clicked.connect
 
         layout1.addLayout(button_layout, stretch = 3)   #space taken by buttons in tabs bar
         layout1.addLayout(layout1_, stretch = 1)
 
         layout2.addWidget(window_basic)
+        layout2.addWidget(window_contains)
+        layout2.addWidget(window_diet)
+        layout2.addWidget(window_disease)
+        layout2.addWidget(window_description)
 
         layout.addLayout(layout1, stretch = 1)       #space taken by content and tab bar
         layout.addLayout(layout2, stretch = 7)
