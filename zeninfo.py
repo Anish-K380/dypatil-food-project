@@ -2,6 +2,11 @@ import PyQt6.QtWidgets as qtw
 
 class MainWindow(qtw.QMainWindow):
     def __init__(self):
+        def shift_basic():layout2.setCurrentIndex(0)
+        def shift_contains():layout2.setCurrentIndex(1)
+        def shift_diet():layout2.setCurrentIndex(2)
+        def shift_disease():layout2.setCurrentIndex(3)
+        def shift_description():layout2.setCurrentIndex(4)
         super().__init__()
         layout = qtw.QHBoxLayout() #master layout
 
@@ -37,22 +42,46 @@ class MainWindow(qtw.QMainWindow):
         button_layout.addWidget(button_description)
         button_layout.addWidget(button_exit)
 
-        for i in range(13):layouta.addWidget(qtw.QWidget(), i, 0)
+        stack = (layouta, layoutb, layoutc, layoutd, layoute)
+
+        for i in range(5):
+            for j in range(32):stack[i].addWidget(qtw.QWidget(), j, 0)
 
         layouta.addWidget(qtw.QLabel('<--'), 13, 0)
-        layouta.addWidget(qtw.QLabel('<--'), 14, 0)
-        layouta.addWidget(qtw.QLabel('<--'), 15, 0)
-        layouta.addWidget(qtw.QLabel('<--'), 16, 0)
-        layouta.addWidget(qtw.QLabel('<--'), 17, 0)
+        layoutb.addWidget(qtw.QLabel('<--'), 14, 0)
+        layoutc.addWidget(qtw.QLabel('<--'), 15, 0)
+        layoutd.addWidget(qtw.QLabel('<--'), 16, 0)
+        layoute.addWidget(qtw.QLabel('<--'), 17, 0)
 
-        for i in range(18, 32):layouta.addWidget(qtw.QWidget(), i, 0)
+        layouta.addWidget(qtw.QLabel('basic'), 4, 4)
+        layoutb.addWidget(qtw.QLabel('contains'), 4, 4)
+        layoutc.addWidget(qtw.QLabel('diet'), 4, 4)
+        layoutd.addWidget(qtw.QLabel('disease'), 4, 4)
+        layoute.addWidget(qtw.QLabel('description'), 4, 4)
+
+        for i in range(5):
+            for j in range(14 +i, 32):stack[i].addWidget(qtw.QWidget(), j, 0)
         
         window_basic.setLayout(layouta)
+        window_contains.setLayout(layoutb)
+        window_diet.setLayout(layoutc)
+        window_disease.setLayout(layoutd)
+        window_description.setLayout(layoute)
 
         layout1.addLayout(button_layout, stretch = 3)   #space taken by buttons in tabs bar
         layout1.addLayout(layout1_, stretch = 1)
 
         layout2.addWidget(window_basic)
+        layout2.addWidget(window_contains)
+        layout2.addWidget(window_diet)
+        layout2.addWidget(window_disease)
+        layout2.addWidget(window_description)
+
+        button_basic.clicked.connect(shift_basic)
+        button_contains.clicked.connect(shift_contains)
+        button_diet.clicked.connect(shift_diet)
+        button_disease.clicked.connect(shift_disease)
+        button_description.clicked.connect(shift_description)
 
         layout.addLayout(layout1, stretch = 1)       #space taken by content and tab bar
         layout.addLayout(layout2, stretch = 7)
