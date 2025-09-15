@@ -2,11 +2,33 @@ import PyQt6.QtWidgets as qtw
 
 class MainWindow(qtw.QMainWindow):
     def __init__(self):
-        def shift_basic():layout2.setCurrentIndex(0)
-        def shift_contains():layout2.setCurrentIndex(1)
-        def shift_diet():layout2.setCurrentIndex(2)
-        def shift_disease():layout2.setCurrentIndex(3)
-        def shift_description():layout2.setCurrentIndex(4)
+        def turnwhite():self.current_button.setStyleSheet('background-color: white;')
+        def turnblue():self.current_button.setStyleSheet('background-color: lightblue;')
+        def shift_basic():
+            layout2.setCurrentIndex(0)
+            turnwhite()
+            self.current_button = button_basic
+            turnblue()
+        def shift_contains():
+            layout2.setCurrentIndex(1)
+            turnwhite()
+            self.current_button = button_contains
+            turnblue()
+        def shift_diet():
+            layout2.setCurrentIndex(2)
+            turnwhite()
+            self.current_button = button_diet
+            turnblue()
+        def shift_disease():
+            layout2.setCurrentIndex(3)
+            turnwhite()
+            self.current_button = button_disease
+            turnblue()
+        def shift_description():
+            layout2.setCurrentIndex(4)
+            turnwhite()
+            self.current_button = button_description
+            turnblue()
         super().__init__()
         layout = qtw.QHBoxLayout() #master layout
 
@@ -33,6 +55,9 @@ class MainWindow(qtw.QMainWindow):
         button_description = qtw.QPushButton('description')
         button_exit = qtw.QPushButton('exit')
 
+        self.current_button = button_basic
+        turnblue()
+
         button_exit.clicked.connect(app.quit)
 
         button_layout.addWidget(button_basic)
@@ -42,26 +67,12 @@ class MainWindow(qtw.QMainWindow):
         button_layout.addWidget(button_description)
         button_layout.addWidget(button_exit)
 
-        stack = (layouta, layoutb, layoutc, layoutd, layoute)
-
-        for i in range(5):
-            for j in range(32):stack[i].addWidget(qtw.QWidget(), j, 0)
-
-        layouta.addWidget(qtw.QLabel('<--'), 13, 0)
-        layoutb.addWidget(qtw.QLabel('<--'), 14, 0)
-        layoutc.addWidget(qtw.QLabel('<--'), 15, 0)
-        layoutd.addWidget(qtw.QLabel('<--'), 16, 0)
-        layoute.addWidget(qtw.QLabel('<--'), 17, 0)
-
         layouta.addWidget(qtw.QLabel('basic'), 4, 4)
         layoutb.addWidget(qtw.QLabel('contains'), 4, 4)
         layoutc.addWidget(qtw.QLabel('diet'), 4, 4)
         layoutd.addWidget(qtw.QLabel('disease'), 4, 4)
         layoute.addWidget(qtw.QLabel('description'), 4, 4)
 
-        for i in range(5):
-            for j in range(14 +i, 32):stack[i].addWidget(qtw.QWidget(), j, 0)
-        
         window_basic.setLayout(layouta)
         window_contains.setLayout(layoutb)
         window_diet.setLayout(layoutc)
