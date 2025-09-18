@@ -1,5 +1,12 @@
 import PyQt6.QtWidgets as qtw
 
+class node:
+    def __init__(self, value, button, prev = None, after = None):
+        self.val = value
+        self.button = button
+        self.left = prev
+        self.right = after
+
 class MainWindow(qtw.QMainWindow):
     def __init__(self):
         def turnwhite():self.current_button.setStyleSheet('background-color: white;')
@@ -29,6 +36,37 @@ class MainWindow(qtw.QMainWindow):
             turnwhite()
             self.current_button = button_description
             turnblue()
+        def create_new_nutrient():
+            if self.last_nutrient.val.text() != '':
+                self.last_nutrient.val.returnPressed.disconnect(create_new_nutrient)
+                self.last_nutrient.right = node(qtw.QLineEdit(), qtw.QPushButton('-'))
+                self.last_nutrient.right.left = self.last_nutrient
+                self.last_nutrient = self.last_nutrient.right
+                layoutnutrients.addWidget(self.last_nutrient.val)
+                layoutnbutton.addWidget(self.last_nutrient.button)
+                self.last_nutrient.val.returnPressed.connect(create_new_nutrient)
+                self.last_nutrient.val.setFocus()
+                nutrients[self.nutrient_id] = self.last_nutrient
+                nutrient_group.addButton(self.last_nutrient.button, self.nutrient_id)
+                self.nutrient_id += 1
+        def delete_nutrient(button):
+            print(self.nutrient_id)
+            if self.last_nutrient.left == None:return None
+            print(2)
+            nutrient = nutrients[nutrient_group.id(button)]
+            if nutrient.right == None:
+                print(3)
+                self.last_nutrient = nutrient.left
+                self.last_nutrient.val.returnPressed.connect(create_new_nutrient)
+                self.last_nutrient.right = None
+            else:nutrient.right.left = nutrient.left
+            print(4)
+            if nutrient.left != None:nutrient.left.right = nutrient.right
+            nutrient.val.setParent(None)
+            nutrient.button.setParent(None)
+            nutrient.val.deleteLater()
+            nutrient.button.deleteLater()
+
         super().__init__()
         layout = qtw.QHBoxLayout() #master layout
 
@@ -43,7 +81,7 @@ class MainWindow(qtw.QMainWindow):
         window_disease = qtw.QWidget()
         window_description = qtw.QWidget()
         layouta = qtw.QVBoxLayout()
-        layoutb = qtw.QGridLayout()
+        layoutb = qtw.QHBoxLayout()
         layoutc = qtw.QGridLayout()
         layoutd = qtw.QGridLayout()
         layoute = qtw.QGridLayout()
@@ -120,7 +158,35 @@ class MainWindow(qtw.QMainWindow):
         layouta.addLayout(layoutquantity)
         layouta.addStretch(2)
 
-        layoutb.addWidget(qtw.QLabel('contains'), 4, 4)
+        layoutb.addWidget(qtw.QLabel('Nutrients:'))
+        layoutnutrients = qtw.QVBoxLayout()
+        layoutnbutton = qtw.QVBoxLayout()
+        layoutnutrients.setSpacing(0)
+        layoutnbutton.setSpacing(0)
+        layoutnutrients.setContentsMargins(0, 0, 0, 0)
+        layoutnbutton.setContentsMargins(0, 0, 0, 0)
+        anchor = qtw.QWidget()
+        anchor.setFixedHeight(0)
+        anchor.setFixedWidth(0)
+        layoutnutrients.addWidget(anchor)
+        anchor = qtw.QWidget()
+        anchor.setFixedHeight(0)
+        anchor.setFixedWidth(0)
+        layoutnbutton.addWidget(anchor)
+        self.nutrient_id = 1
+        nutrients = dict()
+        self.last_nutrient = node(qtw.QLineEdit(), qtw.QPushButton('-'))
+        nutrients[0] = self.last_nutrient
+        nutrients[0].val.returnPressed.connect(create_new_nutrient)
+        nutrient_group = qtw.QButtonGroup()
+        nutrient_group.addButton(nutrients[0].button, 0)
+        nutrient_group.buttonClicked.connect(delete_nutrient)
+        layoutnutrients.addWidget(self.last_nutrient.val)
+        layoutnbutton.addWidget(self.last_nutrient.button)
+        layoutb.addLayout(layoutnutrients)
+        layoutb.addLayout(layoutnbutton)
+        layoutb.addStretch(1)
+        
         layoutc.addWidget(qtw.QLabel('diet'), 4, 4)
         layoutd.addWidget(qtw.QLabel('disease'), 4, 4)
         layoute.addWidget(qtw.QLabel('description'), 4, 4)
