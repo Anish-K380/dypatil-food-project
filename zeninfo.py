@@ -42,30 +42,31 @@ class MainWindow(qtw.QMainWindow):
                 self.last_nutrient.right = node(qtw.QLineEdit(), qtw.QPushButton('-'))
                 self.last_nutrient.right.left = self.last_nutrient
                 self.last_nutrient = self.last_nutrient.right
-                layoutnutrients.addWidget(self.last_nutrient.val)
-                layoutnbutton.addWidget(self.last_nutrient.button)
+                nutrient_text.addWidget(self.last_nutrient.val)
+                nutrient_button.addWidget(self.last_nutrient.button)
                 self.last_nutrient.val.returnPressed.connect(create_new_nutrient)
                 self.last_nutrient.val.setFocus()
                 nutrients[self.nutrient_id] = self.last_nutrient
                 nutrient_group.addButton(self.last_nutrient.button, self.nutrient_id)
                 self.nutrient_id += 1
         def delete_nutrient(button):
-            print(self.nutrient_id)
             if self.last_nutrient.left == None:return None
-            print(2)
             nutrient = nutrients[nutrient_group.id(button)]
             if nutrient.right == None:
-                print(3)
                 self.last_nutrient = nutrient.left
                 self.last_nutrient.val.returnPressed.connect(create_new_nutrient)
                 self.last_nutrient.right = None
             else:nutrient.right.left = nutrient.left
-            print(4)
             if nutrient.left != None:nutrient.left.right = nutrient.right
             nutrient.val.setParent(None)
             nutrient.button.setParent(None)
             nutrient.val.deleteLater()
             nutrient.button.deleteLater()
+        def anchor():
+            temp = qtw.QWidget()
+            temp.setFixedHeight(0)
+            temp.setFixedWidth(0)
+            return temp
 
         super().__init__()
         layout = qtw.QHBoxLayout() #master layout
@@ -104,6 +105,7 @@ class MainWindow(qtw.QMainWindow):
         button_layout.addWidget(button_disease)
         button_layout.addWidget(button_description)
         button_layout.addWidget(button_exit)
+        button_layout.addStretch(1)
 
         layouta.addStretch(2)
         layoutname = qtw.QHBoxLayout()
@@ -158,34 +160,35 @@ class MainWindow(qtw.QMainWindow):
         layouta.addLayout(layoutquantity)
         layouta.addStretch(2)
 
-        layoutb.addWidget(qtw.QLabel('Nutrients:'))
-        layoutnutrients = qtw.QVBoxLayout()
-        layoutnbutton = qtw.QVBoxLayout()
-        layoutnutrients.setSpacing(0)
-        layoutnbutton.setSpacing(0)
-        layoutnutrients.setContentsMargins(0, 0, 0, 0)
-        layoutnbutton.setContentsMargins(0, 0, 0, 0)
-        anchor = qtw.QWidget()
-        anchor.setFixedHeight(0)
-        anchor.setFixedWidth(0)
-        layoutnutrients.addWidget(anchor)
-        anchor = qtw.QWidget()
-        anchor.setFixedHeight(0)
-        anchor.setFixedWidth(0)
-        layoutnbutton.addWidget(anchor)
-        self.nutrient_id = 1
-        nutrients = dict()
+        nutrient_half = qtw.QVBoxLayout()
+        nutrient_header = qtw.QHBoxLayout()
+        nutrient_content = qtw.QHBoxLayout()
+        nutrient_text = qtw.QVBoxLayout()
+        nutrient_button = qtw.QVBoxLayout()
+        nutrient_header.addStretch(1)
+        nutrient_header.addWidget(qtw.QLabel('Nutrients'))
+        nutrient_header.addStretch(1)
+        nutrient_text.addWidget(anchor())
+        nutrient_button.addWidget(anchor())
         self.last_nutrient = node(qtw.QLineEdit(), qtw.QPushButton('-'))
+        self.nutrient_id = 1
+        self.last_nutrient.val.returnPressed.connect(create_new_nutrient)
+        nutrients = dict()
         nutrients[0] = self.last_nutrient
-        nutrients[0].val.returnPressed.connect(create_new_nutrient)
         nutrient_group = qtw.QButtonGroup()
-        nutrient_group.addButton(nutrients[0].button, 0)
+        nutrient_group.addButton(self.last_nutrient.button)
         nutrient_group.buttonClicked.connect(delete_nutrient)
-        layoutnutrients.addWidget(self.last_nutrient.val)
-        layoutnbutton.addWidget(self.last_nutrient.button)
-        layoutb.addLayout(layoutnutrients)
-        layoutb.addLayout(layoutnbutton)
-        layoutb.addStretch(1)
+        nutrient_text.addWidget(self.last_nutrient.val)
+        nutrient_button.addWidget(self.last_nutrient.button)
+        nutrient_content.addStretch(1)
+        nutrient_content.addLayout(nutrient_text)
+        nutrient_content.addLayout(nutrient_button)
+        nutrient_content.addStretch(1)
+        nutrient_half.addLayout(nutrient_header)
+        nutrient_half.addStretch(1)
+        nutrient_half.addLayout(nutrient_content)
+        nutrient_half.addStretch(4)
+        layoutb.addLayout(nutrient_half)
         
         layoutc.addWidget(qtw.QLabel('diet'), 4, 4)
         layoutd.addWidget(qtw.QLabel('disease'), 4, 4)
