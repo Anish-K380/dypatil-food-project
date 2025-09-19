@@ -94,7 +94,7 @@ class MainWindow(qtw.QMainWindow):
             ingredient.button.deleteLater()
             contains_buttons.pop(i_id)
         def create_text(num):
-            if len(last_text[num].val) != 0:
+            if len(last_text[num].val.text()) != 0:
                 last_text[num].val.returnPressed.disconnect(functions[num])
                 last_text[num].right = node(qtw.QLineEdit(), qtw.QPushButton('-'))
                 last_text[num].right.left = last_text[num]
@@ -103,7 +103,7 @@ class MainWindow(qtw.QMainWindow):
                 button_layouts[num].addWidget(last_text[num].button)
                 last_text[num].val.returnPressed.connect(functions[num])
                 last_text[num].val.setFocus()
-                texts[num][self.button_id] = last_text[num]
+                texts[self.button_id] = last_text[num]
                 groups[num].addButton(last_text[num].button, self.button_id)
                 self.button_id += 1
         def delete_text(num, button_id):
@@ -141,7 +141,7 @@ class MainWindow(qtw.QMainWindow):
         window_description = qtw.QWidget()
         layouta = qtw.QVBoxLayout()
         layoutb = qtw.QHBoxLayout()
-        layoutc = qtw.QGridLayout()
+        layoutc = qtw.QHBoxLayout()
         layoutd = qtw.QGridLayout()
         layoute = qtw.QGridLayout()
 
@@ -219,6 +219,14 @@ class MainWindow(qtw.QMainWindow):
         layouta.addLayout(layoutquantity)
         layouta.addStretch(2)
 
+        last_text = [0, 1]
+        text_layouts = [0, 1]
+        functions = [0, 1]
+        button_layouts = [0, 1]
+        groups = [0, 1]
+        texts = dict()
+        self.button_id = 5
+
         nutrient_half = qtw.QVBoxLayout()
         nutrient_header = qtw.QHBoxLayout()
         nutrient_content = qtw.QHBoxLayout()
@@ -278,8 +286,98 @@ class MainWindow(qtw.QMainWindow):
         layoutb.addStretch(1)
         layoutb.addLayout(ingredient_half)
         layoutb.addStretch(1)
+
+        bt_layout = qtw.QVBoxLayout()
+        diet_layout = qtw.QVBoxLayout()
+        btte_layout = qtw.QVBoxLayout()
+        bt_header = qtw.QHBoxLayout()
+        diet_header = qtw.QHBoxLayout()
+        btte_header = qtw.QHBoxLayout()
+        bt_header.addStretch(1)
+        diet_header.addStretch(1)
+        btte_header.addStretch(1)
+        bt_header.addWidget(qtw.QLabel('Body Type'))
+        diet_header.addWidget(qtw.QLabel('Diet'))
+        btte_header.addWidget(qtw.QLabel('Best time to eat'))
+        bt_header.addStretch(1)
+        diet_header.addStretch(1)
+        btte_header.addStretch(1)
+        bt_layout.addLayout(bt_header)
+        diet_layout.addLayout(diet_header)
+        btte_layout.addLayout(btte_header)
+        bt_layout.addStretch(1)
+        diet_layout.addStretch(1)
+        btte_layout.addStretch(1)
+        bt_content = qtw.QHBoxLayout()
+        diet_content = qtw.QHBoxLayout()
+        btte_content = qtw.QHBoxLayout()
+        bt_content.addStretch(1)
+        diet_content.addStretch(1)
+        btte_content.addStretch(1)
+        bt_text = qtw.QVBoxLayout()
+        diet_text = qtw.QVBoxLayout()
+        btte_text = qtw.QVBoxLayout()
+        bt_text.addWidget(anchor())
+        diet_text.addWidget(anchor())
+        btte_text.addWidget(anchor())
+        bt_button = qtw.QVBoxLayout()
+        diet_button = qtw.QVBoxLayout()
+        btte_button = qtw.QVBoxLayout()
+        bt_button.addWidget(anchor())
+        diet_button.addWidget(anchor())
+        btte_button.addWidget(anchor())
+        last_text.append(node(qtw.QLineEdit(), qtw.QPushButton('-')))
+        last_text.append(node(qtw.QLineEdit(), qtw.QPushButton('-')))
+        last_text.append(node(qtw.QLineEdit(), qtw.QPushButton('-')))
+        texts[2] = last_text[2]
+        texts[3] = last_text[3]
+        texts[4] = last_text[4]
+        text_layouts.append(bt_text)
+        text_layouts.append(diet_text)
+        text_layouts.append(btte_text)
+        button_layouts.append(bt_button)
+        button_layouts.append(diet_button)
+        button_layouts.append(btte_button)
+        functions.append(partial(create_text, 2))
+        functions.append(partial(create_text, 3))
+        functions.append(partial(create_text, 4))
+        groups.append(qtw.QButtonGroup())
+        groups.append(qtw.QButtonGroup())
+        groups.append(qtw.QButtonGroup())
+        groups[2].addButton(last_text[2].button, 2)
+        groups[3].addButton(last_text[3].button, 3)
+        groups[4].addButton(last_text[4].button, 4)
+        groups[2].idClicked.connect(partial(delete_text, 2))
+        groups[3].idClicked.connect(partial(delete_text, 3))
+        groups[4].idClicked.connect(partial(delete_text, 4))
+        last_text[2].val.returnPressed.connect(functions[2])
+        last_text[3].val.returnPressed.connect(functions[3])
+        last_text[4].val.returnPressed.connect(functions[4])
+        bt_text.addWidget(last_text[2].val)
+        diet_text.addWidget(last_text[3].val)
+        btte_text.addWidget(last_text[4].val)
+        bt_button.addWidget(last_text[2].button)
+        diet_button.addWidget(last_text[3].button)
+        btte_button.addWidget(last_text[4].button)
+        bt_content.addLayout(bt_text)
+        diet_content.addLayout(diet_text)
+        btte_content.addLayout(btte_text)
+        bt_content.addLayout(bt_button)
+        diet_content.addLayout(diet_button)
+        btte_content.addLayout(btte_button)
+        bt_content.addStretch(1)
+        diet_content.addStretch(1)
+        btte_content.addStretch(1)
+        bt_layout.addLayout(bt_content)
+        diet_layout.addLayout(diet_content)
+        btte_layout.addLayout(btte_content)
+        bt_layout.addStretch(4)
+        diet_layout.addStretch(4)
+        btte_layout.addStretch(4)
+        layoutc.addLayout(bt_layout)
+        layoutc.addLayout(diet_layout)
+        layoutc.addLayout(btte_layout)
         
-        layoutc.addWidget(qtw.QLabel('diet'), 4, 4)
         layoutd.addWidget(qtw.QLabel('disease'), 4, 4)
         layoute.addWidget(qtw.QLabel('description'), 4, 4)
 
