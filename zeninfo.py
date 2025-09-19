@@ -37,62 +37,6 @@ class MainWindow(qtw.QMainWindow):
             turnwhite()
             self.current_button = button_description
             turnblue()
-        def create_new_nutrient():
-            if self.last_nutrient.val.text() != '':
-                self.last_nutrient.val.returnPressed.disconnect(create_new_nutrient)
-                self.last_nutrient.right = node(qtw.QLineEdit(), qtw.QPushButton('-'))
-                self.last_nutrient.right.left = self.last_nutrient
-                self.last_nutrient = self.last_nutrient.right
-                nutrient_text.addWidget(self.last_nutrient.val)
-                nutrient_button.addWidget(self.last_nutrient.button)
-                self.last_nutrient.val.returnPressed.connect(create_new_nutrient)
-                self.last_nutrient.val.setFocus()
-                contains_buttons[self.contains_button_id] = self.last_nutrient
-                nutrient_group.addButton(self.last_nutrient.button, self.contains_button_id)
-                self.contains_button_id += 1
-        def delete_nutrient(button):
-            if self.last_nutrient.left == None:return None
-            n_id = nutrient_group.id(button)
-            nutrient = contains_buttons[n_id]
-            if nutrient.right == None:
-                self.last_nutrient = nutrient.left
-                self.last_nutrient.val.returnPressed.connect(create_new_nutrient)
-                self.last_nutrient.right = None
-            else:nutrient.right.left = nutrient.left
-            if nutrient.left != None:nutrient.left.right = nutrient.right
-            nutrient.val.setParent(None)
-            nutrient.button.setParent(None)
-            nutrient.val.deleteLater()
-            nutrient.button.deleteLater()
-            contains_buttons.pop(n_id)
-        def create_new_ingredient():
-            if self.last_ingredient.val.text() != '':
-                self.last_ingredient.val.returnPressed.disconnect(create_new_ingredient)
-                self.last_ingredient.right = node(qtw.QLineEdit(), qtw.QPushButton('-'))
-                self.last_ingredient.right.left = self.last_ingredient
-                self.last_ingredient = self.last_ingredient.right
-                ingredient_text.addWidget(self.last_ingredient.val)
-                ingredient_button.addWidget(self.last_ingredient.button)
-                self.last_ingredient.val.returnPressed.connect(create_new_ingredient)
-                self.last_ingredient.val.setFocus()
-                contains_buttons[self.contains_button_id] = self.last_ingredient
-                ingredient_group.addButton(self.last_ingredient.button, self.contains_button_id)
-                self.contains_button_id += 1
-        def delete_ingredient(button):
-            if self.last_ingredient.left == None:return None
-            i_id = ingredient_group.id(button)
-            ingredient = contains_buttons[i_id]
-            if ingredient.right == None:
-                self.last_ingredient = ingredient.left
-                ingredient.left.val.returnPressed.connect(create_new_ingredient)
-                ingredient.left.right = None
-            else:ingredient.right.left = ingredient.left
-            if ingredient.left != None:ingredient.left.right = ingredient.right
-            ingredient.val.setParent(None)
-            ingredient.button.setParent(None)
-            ingredient.val.deleteLater()
-            ingredient.button.deleteLater()
-            contains_buttons.pop(i_id)
         def create_text(num):
             if len(last_text[num].val.text()) != 0:
                 last_text[num].val.returnPressed.disconnect(functions[num])
@@ -219,73 +163,74 @@ class MainWindow(qtw.QMainWindow):
         layouta.addLayout(layoutquantity)
         layouta.addStretch(2)
 
-        last_text = [0, 1]
-        text_layouts = [0, 1]
-        functions = [0, 1]
-        button_layouts = [0, 1]
-        groups = [0, 1]
+        last_text = list()
+        text_layouts = list()
+        functions = list()
+        button_layouts = list()
+        groups = list()
         texts = dict()
         self.button_id = 5
 
-        nutrient_half = qtw.QVBoxLayout()
+        nutrient_layout = qtw.QVBoxLayout()
+        ingredient_layout = qtw.QVBoxLayout()
         nutrient_header = qtw.QHBoxLayout()
-        nutrient_content = qtw.QHBoxLayout()
-        nutrient_text = qtw.QVBoxLayout()
-        nutrient_button = qtw.QVBoxLayout()
-        nutrient_header.addStretch(1)
-        nutrient_header.addWidget(qtw.QLabel('Nutrients'))
-        nutrient_header.addStretch(1)
-        nutrient_text.addWidget(anchor())
-        nutrient_button.addWidget(anchor())
-        self.last_nutrient = node(qtw.QLineEdit(), qtw.QPushButton('-'))
-        self.contains_button_id = 2
-        self.last_nutrient.val.returnPressed.connect(create_new_nutrient)
-        contains_buttons = dict()
-        contains_buttons[0] = self.last_nutrient
-        nutrient_group = qtw.QButtonGroup()
-        nutrient_group.addButton(self.last_nutrient.button, 0)
-        nutrient_group.buttonClicked.connect(delete_nutrient)
-        nutrient_text.addWidget(self.last_nutrient.val)
-        nutrient_button.addWidget(self.last_nutrient.button)
-        nutrient_content.addStretch(1)
-        nutrient_content.addLayout(nutrient_text)
-        nutrient_content.addLayout(nutrient_button)
-        nutrient_content.addStretch(1)
-        nutrient_half.addLayout(nutrient_header)
-        nutrient_half.addStretch(1)
-        nutrient_half.addLayout(nutrient_content)
-        nutrient_half.addStretch(4)
-        ingredient_half = qtw.QVBoxLayout()
         ingredient_header = qtw.QHBoxLayout()
-        ingredient_content = qtw.QHBoxLayout()
-        ingredient_text = qtw.QVBoxLayout()
-        ingredient_button = qtw.QVBoxLayout()
+        nutrient_header.addStretch(1)
         ingredient_header.addStretch(1)
+        nutrient_header.addWidget(qtw.QLabel('Nutrients'))
         ingredient_header.addWidget(qtw.QLabel('Ingredients'))
+        nutrient_header.addStretch(1)
         ingredient_header.addStretch(1)
+        nutrient_layout.addLayout(nutrient_header)
+        ingredient_layout.addLayout(ingredient_header)
+        nutrient_layout.addStretch(1)
+        ingredient_layout.addStretch(1)
+        nutrient_content = qtw.QHBoxLayout()
+        ingredient_content = qtw.QHBoxLayout()
+        nutrient_content.addStretch(1)
+        ingredient_content.addStretch(1)
+        nutrient_text = qtw.QVBoxLayout()
+        ingredient_text = qtw.QVBoxLayout()
+        nutrient_button = qtw.QVBoxLayout()
+        ingredient_button = qtw.QVBoxLayout()
+        nutrient_text.addWidget(anchor())
         ingredient_text.addWidget(anchor())
+        nutrient_button.addWidget(anchor())
         ingredient_button.addWidget(anchor())
-        self.last_ingredient = node(qtw.QLineEdit(), qtw.QPushButton('-'))
-        self.last_ingredient.val.returnPressed.connect(create_new_ingredient)
-        ingredients = dict()
-        contains_buttons[1] = self.last_ingredient
-        ingredient_group = qtw.QButtonGroup()
-        ingredient_group.addButton(self.last_ingredient.button, 1)
-        ingredient_group.buttonClicked.connect(delete_ingredient)
-        ingredient_text.addWidget(self.last_ingredient.val)
-        ingredient_button.addWidget(self.last_ingredient.button)
-        ingredient_content.addStretch(1)
+        last_text.append(node(qtw.QLineEdit(), qtw.QPushButton('-')))
+        last_text.append(node(qtw.QLineEdit(), qtw.QPushButton('-')))
+        texts[0] = last_text[0]
+        texts[1] = last_text[1]
+        text_layouts.append(nutrient_text)
+        text_layouts.append(ingredient_text)
+        button_layouts.append(nutrient_button)
+        button_layouts.append(ingredient_button)
+        functions.append(partial(create_text, 0))
+        functions.append(partial(create_text, 1))
+        groups.append(qtw.QButtonGroup())
+        groups.append(qtw.QButtonGroup())
+        groups[0].addButton(texts[0].button, 0)
+        groups[1].addButton(texts[1].button, 1)
+        groups[0].idClicked.connect(partial(delete_text, 0))
+        groups[1].idClicked.connect(partial(delete_text, 1))
+        texts[0].val.returnPressed.connect(functions[0])
+        texts[1].val.returnPressed.connect(functions[1])
+        nutrient_text.addWidget(texts[0].val)
+        ingredient_text.addWidget(texts[1].val)
+        nutrient_button.addWidget(texts[0].button)
+        ingredient_button.addWidget(texts[1].button)
+        nutrient_content.addLayout(nutrient_text)
         ingredient_content.addLayout(ingredient_text)
+        nutrient_content.addLayout(nutrient_button)
         ingredient_content.addLayout(ingredient_button)
+        nutrient_content.addStretch(1)
         ingredient_content.addStretch(1)
-        ingredient_half.addLayout(ingredient_header)
-        ingredient_half.addStretch(1)
-        ingredient_half.addLayout(ingredient_content)
-        ingredient_half.addStretch(4)
-        layoutb.addLayout(nutrient_half)
-        layoutb.addStretch(1)
-        layoutb.addLayout(ingredient_half)
-        layoutb.addStretch(1)
+        nutrient_layout.addLayout(nutrient_content)
+        ingredient_layout.addLayout(ingredient_content)
+        nutrient_layout.addStretch(4)
+        ingredient_layout.addStretch(4)
+        layoutb.addLayout(nutrient_layout)
+        layoutb.addLayout(ingredient_layout)
 
         bt_layout = qtw.QVBoxLayout()
         diet_layout = qtw.QVBoxLayout()
