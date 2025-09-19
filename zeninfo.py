@@ -1,4 +1,5 @@
 import PyQt6.QtWidgets as qtw
+from functools import partial
 
 class node:
     def __init__(self, value, button, prev = None, after = None):
@@ -46,13 +47,13 @@ class MainWindow(qtw.QMainWindow):
                 nutrient_button.addWidget(self.last_nutrient.button)
                 self.last_nutrient.val.returnPressed.connect(create_new_nutrient)
                 self.last_nutrient.val.setFocus()
-                nutrients[self.nutrient_id] = self.last_nutrient
-                nutrient_group.addButton(self.last_nutrient.button, self.nutrient_id)
-                self.nutrient_id += 1
+                contains_buttons[self.contains_button_id] = self.last_nutrient
+                nutrient_group.addButton(self.last_nutrient.button, self.contains_button_id)
+                self.contains_button_id += 1
         def delete_nutrient(button):
             if self.last_nutrient.left == None:return None
             n_id = nutrient_group.id(button)
-            nutrient = nutrients[n_id]
+            nutrient = contains_buttons[n_id]
             if nutrient.right == None:
                 self.last_nutrient = nutrient.left
                 self.last_nutrient.val.returnPressed.connect(create_new_nutrient)
@@ -63,7 +64,7 @@ class MainWindow(qtw.QMainWindow):
             nutrient.button.setParent(None)
             nutrient.val.deleteLater()
             nutrient.button.deleteLater()
-            nutrients.pop(n_id)
+            contains_buttons.pop(n_id)
         def create_new_ingredient():
             if self.last_ingredient.val.text() != '':
                 self.last_ingredient.val.returnPressed.disconnect(create_new_ingredient)
@@ -74,13 +75,13 @@ class MainWindow(qtw.QMainWindow):
                 ingredient_button.addWidget(self.last_ingredient.button)
                 self.last_ingredient.val.returnPressed.connect(create_new_ingredient)
                 self.last_ingredient.val.setFocus()
-                ingredients[self.ingredient_id] = self.last_ingredient
-                ingredient_group.addButton(self.last_ingredient.button, self.ingredient_id)
-                self.ingredient_id += 1
+                contains_buttons[self.contains_button_id] = self.last_ingredient
+                ingredient_group.addButton(self.last_ingredient.button, self.contains_button_id)
+                self.contains_button_id += 1
         def delete_ingredient(button):
             if self.last_ingredient.left == None:return None
             i_id = ingredient_group.id(button)
-            ingredient = ingredients[i_id]
+            ingredient = contains_buttons[i_id]
             if ingredient.right == None:
                 self.last_ingredient = ingredient.left
                 ingredient.left.val.returnPressed.connect(create_new_ingredient)
@@ -91,7 +92,34 @@ class MainWindow(qtw.QMainWindow):
             ingredient.button.setParent(None)
             ingredient.val.deleteLater()
             ingredient.button.deleteLater()
-            ingredients.pop(i_id)
+            contains_buttons.pop(i_id)
+        def create_text(num):
+            if len(last_text[num].val) != 0:
+                last_text[num].val.returnPressed.disconnect(functions[num])
+                last_text[num].right = node(qtw.QLineEdit(), qtw.QPushButton('-'))
+                last_text[num].right.left = last_text[num]
+                last_text[num] = last_text[num].right
+                text_layouts[num].addWidget(last_text[num].val)
+                button_layouts[num].addWidget(last_text[num].button)
+                last_text[num].val.returnPressed.connect(functions[num])
+                last_text[num].val.setFocus()
+                texts[num][self.button_id] = last_text[num]
+                groups[num].addButton(last_text[num].button, self.button_id)
+                self.button_id += 1
+        def delete_text(num, button_id):
+            if last_text[num].left == None:return None
+            text = texts[button_id]
+            if text.right == None:
+                last_text[num] = text.left
+                text.left.right = None
+                text.left.val.returnPressed.connect(functions[num])
+            else:text.right.left = text.left
+            if text.left != None:text.left.right = text.right
+            text.val.setParent(None)
+            text.button.setParent(None)
+            text.val.deleteLater()
+            text.button.deleteLater()
+            texts.pop(button_id)
         def anchor():
             temp = qtw.QWidget()
             temp.setFixedHeight(0)
@@ -202,12 +230,12 @@ class MainWindow(qtw.QMainWindow):
         nutrient_text.addWidget(anchor())
         nutrient_button.addWidget(anchor())
         self.last_nutrient = node(qtw.QLineEdit(), qtw.QPushButton('-'))
-        self.nutrient_id = 1
+        self.contains_button_id = 2
         self.last_nutrient.val.returnPressed.connect(create_new_nutrient)
-        nutrients = dict()
-        nutrients[0] = self.last_nutrient
+        contains_buttons = dict()
+        contains_buttons[0] = self.last_nutrient
         nutrient_group = qtw.QButtonGroup()
-        nutrient_group.addButton(self.last_nutrient.button)
+        nutrient_group.addButton(self.last_nutrient.button, 0)
         nutrient_group.buttonClicked.connect(delete_nutrient)
         nutrient_text.addWidget(self.last_nutrient.val)
         nutrient_button.addWidget(self.last_nutrient.button)
@@ -230,12 +258,11 @@ class MainWindow(qtw.QMainWindow):
         ingredient_text.addWidget(anchor())
         ingredient_button.addWidget(anchor())
         self.last_ingredient = node(qtw.QLineEdit(), qtw.QPushButton('-'))
-        self.ingredient_id = 1
         self.last_ingredient.val.returnPressed.connect(create_new_ingredient)
         ingredients = dict()
-        ingredients[0] = self.last_ingredient
+        contains_buttons[1] = self.last_ingredient
         ingredient_group = qtw.QButtonGroup()
-        ingredient_group.addButton(self.last_ingredient.button, 0)
+        ingredient_group.addButton(self.last_ingredient.button, 1)
         ingredient_group.buttonClicked.connect(delete_ingredient)
         ingredient_text.addWidget(self.last_ingredient.val)
         ingredient_button.addWidget(self.last_ingredient.button)
