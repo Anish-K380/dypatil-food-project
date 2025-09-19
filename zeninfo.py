@@ -51,7 +51,8 @@ class MainWindow(qtw.QMainWindow):
                 self.nutrient_id += 1
         def delete_nutrient(button):
             if self.last_nutrient.left == None:return None
-            nutrient = nutrients[nutrient_group.id(button)]
+            n_id = nutrient_group.id(button)
+            nutrient = nutrients[n_id]
             if nutrient.right == None:
                 self.last_nutrient = nutrient.left
                 self.last_nutrient.val.returnPressed.connect(create_new_nutrient)
@@ -62,6 +63,35 @@ class MainWindow(qtw.QMainWindow):
             nutrient.button.setParent(None)
             nutrient.val.deleteLater()
             nutrient.button.deleteLater()
+            nutrients.pop(n_id)
+        def create_new_ingredient():
+            if self.last_ingredient.val.text() != '':
+                self.last_ingredient.val.returnPressed.disconnect(create_new_ingredient)
+                self.last_ingredient.right = node(qtw.QLineEdit(), qtw.QPushButton('-'))
+                self.last_ingredient.right.left = self.last_ingredient
+                self.last_ingredient = self.last_ingredient.right
+                ingredient_text.addWidget(self.last_ingredient.val)
+                ingredient_button.addWidget(self.last_ingredient.button)
+                self.last_ingredient.val.returnPressed.connect(create_new_ingredient)
+                self.last_ingredient.val.setFocus()
+                ingredients[self.ingredient_id] = self.last_ingredient
+                ingredient_group.addButton(self.last_ingredient.button, self.ingredient_id)
+                self.ingredient_id += 1
+        def delete_ingredient(button):
+            if self.last_ingredient.left == None:return None
+            i_id = ingredient_group.id(button)
+            ingredient = ingredients[i_id]
+            if ingredient.right == None:
+                self.last_ingredient = ingredient.left
+                ingredient.left.val.returnPressed.connect(create_new_ingredient)
+                ingredient.left.right = None
+            else:ingredient.right.left = ingredient.left
+            if ingredient.left != None:ingredient.left.right = ingredient.right
+            ingredient.val.setParent(None)
+            ingredient.button.setParent(None)
+            ingredient.val.deleteLater()
+            ingredient.button.deleteLater()
+            ingredients.pop(i_id)
         def anchor():
             temp = qtw.QWidget()
             temp.setFixedHeight(0)
@@ -104,6 +134,7 @@ class MainWindow(qtw.QMainWindow):
         button_layout.addWidget(button_diet)
         button_layout.addWidget(button_disease)
         button_layout.addWidget(button_description)
+        button_layout.addStretch(6)
         button_layout.addWidget(button_exit)
         button_layout.addStretch(1)
 
@@ -188,7 +219,38 @@ class MainWindow(qtw.QMainWindow):
         nutrient_half.addStretch(1)
         nutrient_half.addLayout(nutrient_content)
         nutrient_half.addStretch(4)
+        ingredient_half = qtw.QVBoxLayout()
+        ingredient_header = qtw.QHBoxLayout()
+        ingredient_content = qtw.QHBoxLayout()
+        ingredient_text = qtw.QVBoxLayout()
+        ingredient_button = qtw.QVBoxLayout()
+        ingredient_header.addStretch(1)
+        ingredient_header.addWidget(qtw.QLabel('Ingredients'))
+        ingredient_header.addStretch(1)
+        ingredient_text.addWidget(anchor())
+        ingredient_button.addWidget(anchor())
+        self.last_ingredient = node(qtw.QLineEdit(), qtw.QPushButton('-'))
+        self.ingredient_id = 1
+        self.last_ingredient.val.returnPressed.connect(create_new_ingredient)
+        ingredients = dict()
+        ingredients[0] = self.last_ingredient
+        ingredient_group = qtw.QButtonGroup()
+        ingredient_group.addButton(self.last_ingredient.button, 0)
+        ingredient_group.buttonClicked.connect(delete_ingredient)
+        ingredient_text.addWidget(self.last_ingredient.val)
+        ingredient_button.addWidget(self.last_ingredient.button)
+        ingredient_content.addStretch(1)
+        ingredient_content.addLayout(ingredient_text)
+        ingredient_content.addLayout(ingredient_button)
+        ingredient_content.addStretch(1)
+        ingredient_half.addLayout(ingredient_header)
+        ingredient_half.addStretch(1)
+        ingredient_half.addLayout(ingredient_content)
+        ingredient_half.addStretch(4)
         layoutb.addLayout(nutrient_half)
+        layoutb.addStretch(1)
+        layoutb.addLayout(ingredient_half)
+        layoutb.addStretch(1)
         
         layoutc.addWidget(qtw.QLabel('diet'), 4, 4)
         layoutd.addWidget(qtw.QLabel('disease'), 4, 4)
