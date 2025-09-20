@@ -167,6 +167,14 @@ class MainWindow(qtw.QMainWindow):
         layoutquantity.addLayout(quantityunit)
         layoutquantity.addStretch(1)
         layouta.addLayout(layoutquantity)
+        next_button = qtw.QPushButton('next')
+        next_button.clicked.connect(shift_contains)
+        next_layout = qtw.QHBoxLayout()
+        next_layout.addStretch(4)
+        next_layout.addWidget(next_button)
+        next_layout.addStretch(1)
+        layouta.addStretch(3)
+        layouta.addLayout(next_layout)
         layouta.addStretch(2)
 
         last_text = list()
@@ -184,7 +192,7 @@ class MainWindow(qtw.QMainWindow):
         nutrient_header.addStretch(1)
         ingredient_header.addStretch(1)
         nutrient_header.addWidget(qtw.QLabel('Nutrients'))
-        ingredient_header.addWidget(qtw.QLabel('Ingredients'))
+        ingredient_header.addWidget(qtw.QLabel('Ingredients'))               #contains page
         nutrient_header.addStretch(1)
         ingredient_header.addStretch(1)
         nutrient_layout.addLayout(nutrient_header)
@@ -236,7 +244,17 @@ class MainWindow(qtw.QMainWindow):
         nutrient_layout.addStretch(4)
         ingredient_layout.addStretch(4)
         layoutb.addLayout(nutrient_layout)
+        layoutb.addStretch(9)
         layoutb.addLayout(ingredient_layout)
+        layoutb.addStretch(3)
+        next_layout = qtw.QVBoxLayout()
+        next_layout.addStretch(83)
+        next_button = qtw.QPushButton('next')
+        next_button.clicked.connect(shift_diet)
+        next_layout.addWidget(next_button)
+        next_layout.addStretch(17)
+        layoutb.addLayout(next_layout)
+        layoutb.addStretch(4)
 
         bt_layout = qtw.QVBoxLayout()
         diet_layout = qtw.QVBoxLayout()
@@ -249,7 +267,7 @@ class MainWindow(qtw.QMainWindow):
         btte_header.addStretch(1)
         bt_header.addWidget(qtw.QLabel('Body Type'))
         diet_header.addWidget(qtw.QLabel('Diet'))
-        btte_header.addWidget(qtw.QLabel('Best time to eat'))
+        btte_header.addWidget(qtw.QLabel('Best time to eat'))                #diet page
         bt_header.addStretch(1)
         diet_header.addStretch(1)
         btte_header.addStretch(1)
@@ -335,7 +353,7 @@ class MainWindow(qtw.QMainWindow):
         allergy_header = qtw.QHBoxLayout()
         disease_header.addStretch(1)
         allergy_header.addStretch(1)
-        disease_header.addWidget(qtw.QLabel('Disease'))
+        disease_header.addWidget(qtw.QLabel('Disease'))                #suitability page
         allergy_header.addWidget(qtw.QLabel('Allergy'))
         disease_header.addStretch(1)
         allergy_header.addStretch(1)
@@ -397,7 +415,7 @@ class MainWindow(qtw.QMainWindow):
         layoutd.addLayout(allergy_layout)
 
         description_layout = qtw.QVBoxLayout()
-        description_layout.addWidget(qtw.QLabel('Description'))
+        description_layout.addWidget(qtw.QLabel('Description'))           #description page
         description_layout.addStretch(1)
         description = qtw.QTextEdit()
         description.setMinimumHeight(300)
