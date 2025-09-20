@@ -2,9 +2,10 @@ import PyQt6.QtWidgets as qtw
 from functools import partial
 
 class node:
-    def __init__(self, value, button, prev = None, after = None):
+    def __init__(self, value, button, cbox = None, prev = None, after = None):
         self.val = value
         self.button = button
+        self.checkbox = cbox
         self.left = prev
         self.right = after
 
@@ -27,10 +28,10 @@ class MainWindow(qtw.QMainWindow):
             turnwhite()
             self.current_button = button_diet
             turnblue()
-        def shift_disease():
+        def shift_suitability():
             layout2.setCurrentIndex(3)
             turnwhite()
-            self.current_button = button_disease
+            self.current_button = button_suitability
             turnblue()
         def shift_description():
             layout2.setCurrentIndex(4)
@@ -50,6 +51,9 @@ class MainWindow(qtw.QMainWindow):
                 texts[self.button_id] = last_text[num]
                 groups[num].addButton(last_text[num].button, self.button_id)
                 self.button_id += 1
+                if num == 5:
+                    last_text[5].checkbox = qtw.QCheckBox('Good')
+                    disease_check.addWidget(last_text[5].checkbox)
         def delete_text(num, button_id):
             if last_text[num].left == None:return None
             text = texts[button_id]
@@ -64,6 +68,7 @@ class MainWindow(qtw.QMainWindow):
             text.val.deleteLater()
             text.button.deleteLater()
             texts.pop(button_id)
+            if num == 5:text.checkbox.setParent(None)
         def anchor():
             temp = qtw.QWidget()
             temp.setFixedHeight(0)
@@ -81,18 +86,18 @@ class MainWindow(qtw.QMainWindow):
         window_basic = qtw.QWidget()
         window_contains = qtw.QWidget()
         window_diet = qtw.QWidget()
-        window_disease = qtw.QWidget()
+        window_suitability = qtw.QWidget()
         window_description = qtw.QWidget()
         layouta = qtw.QVBoxLayout()
         layoutb = qtw.QHBoxLayout()
         layoutc = qtw.QHBoxLayout()
-        layoutd = qtw.QGridLayout()
-        layoute = qtw.QGridLayout()
+        layoutd = qtw.QHBoxLayout()
+        layoute = qtw.QHBoxLayout()
 
         button_basic = qtw.QPushButton('basic')
         button_contains = qtw.QPushButton('contains')
         button_diet = qtw.QPushButton('diet')
-        button_disease = qtw.QPushButton('disease')
+        button_suitability = qtw.QPushButton('suitablitiy')
         button_description = qtw.QPushButton('description')
         button_exit = qtw.QPushButton('exit')
 
@@ -101,10 +106,11 @@ class MainWindow(qtw.QMainWindow):
 
         button_exit.clicked.connect(app.quit)
 
+        button_layout.addStretch(1)
         button_layout.addWidget(button_basic)
         button_layout.addWidget(button_contains)
         button_layout.addWidget(button_diet)
-        button_layout.addWidget(button_disease)
+        button_layout.addWidget(button_suitability)
         button_layout.addWidget(button_description)
         button_layout.addStretch(6)
         button_layout.addWidget(button_exit)
@@ -169,7 +175,7 @@ class MainWindow(qtw.QMainWindow):
         button_layouts = list()
         groups = list()
         texts = dict()
-        self.button_id = 5
+        self.button_id = 7
 
         nutrient_layout = qtw.QVBoxLayout()
         ingredient_layout = qtw.QVBoxLayout()
@@ -323,13 +329,89 @@ class MainWindow(qtw.QMainWindow):
         layoutc.addLayout(diet_layout)
         layoutc.addLayout(btte_layout)
         
-        layoutd.addWidget(qtw.QLabel('disease'), 4, 4)
-        layoute.addWidget(qtw.QLabel('description'), 4, 4)
+        disease_layout = qtw.QVBoxLayout()
+        allergy_layout = qtw.QVBoxLayout()
+        disease_header = qtw.QHBoxLayout()
+        allergy_header = qtw.QHBoxLayout()
+        disease_header.addStretch(1)
+        allergy_header.addStretch(1)
+        disease_header.addWidget(qtw.QLabel('Disease'))
+        allergy_header.addWidget(qtw.QLabel('Allergy'))
+        disease_header.addStretch(1)
+        allergy_header.addStretch(1)
+        disease_layout.addLayout(disease_header)
+        allergy_layout.addLayout(allergy_header)
+        disease_layout.addStretch(1)
+        allergy_layout.addStretch(1)
+        disease_content = qtw.QHBoxLayout()
+        allergy_content = qtw.QHBoxLayout()
+        disease_content.addStretch(1)
+        allergy_content.addStretch(1)
+        disease_text = qtw.QVBoxLayout()
+        allergy_text = qtw.QVBoxLayout()
+        disease_button = qtw.QVBoxLayout()
+        allergy_button = qtw.QVBoxLayout()
+        disease_check = qtw.QVBoxLayout()
+        disease_text.addWidget(anchor())
+        allergy_text.addWidget(anchor())
+        disease_button.addWidget(anchor())
+        allergy_button.addWidget(anchor())
+        disease_check.addWidget(anchor())
+        last_text.append(node(qtw.QLineEdit(), qtw.QPushButton('-'), qtw.QCheckBox('Good')))
+        last_text.append(node(qtw.QLineEdit(), qtw.QPushButton('-')))
+        texts[5] = last_text[5]
+        texts[6] = last_text[6]
+        text_layouts.append(disease_text)
+        text_layouts.append(allergy_text)
+        button_layouts.append(disease_button)
+        button_layouts.append(allergy_button)
+        functions.append(partial(create_text, 5))
+        functions.append(partial(create_text, 6))
+        groups.append(qtw.QButtonGroup())
+        groups.append(qtw.QButtonGroup())
+        groups[5].idClicked.connect(partial(delete_text, 5))
+        groups[6].idClicked.connect(partial(delete_text, 6))
+        texts[5] = last_text[5]
+        texts[6] = last_text[6]
+        texts[5].val.returnPressed.connect(functions[5])
+        texts[6].val.returnPressed.connect(functions[6])
+        groups[5].addButton(texts[5].button, 5)
+        groups[6].addButton(texts[6].button, 6)
+        disease_text.addWidget(texts[5].val)
+        allergy_text.addWidget(texts[6].val)
+        disease_button.addWidget(texts[5].button)
+        allergy_button.addWidget(texts[6].button)
+        disease_check.addWidget(texts[5].checkbox)
+        disease_content.addLayout(disease_text)
+        allergy_content.addLayout(allergy_text)
+        disease_content.addLayout(disease_check)
+        allergy_content.addLayout(allergy_button)
+        disease_content.addLayout(disease_button)
+        disease_content.addStretch(1)
+        allergy_content.addStretch(1)
+        disease_layout.addLayout(disease_content)
+        allergy_layout.addLayout(allergy_content)
+        disease_layout.addStretch(4)
+        allergy_layout.addStretch(4)
+        layoutd.addLayout(disease_layout)
+        layoutd.addLayout(allergy_layout)
+
+        description_layout = qtw.QVBoxLayout()
+        description_layout.addWidget(qtw.QLabel('Description'))
+        description_layout.addStretch(1)
+        description = qtw.QTextEdit()
+        description.setMinimumHeight(300)
+        description.setMinimumWidth(500)
+        description_layout.addWidget(description)
+        description_layout.addStretch(3)
+        layoute.addStretch(1)
+        layoute.addLayout(description_layout)
+        layoute.addStretch(1)
 
         window_basic.setLayout(layouta)
         window_contains.setLayout(layoutb)
         window_diet.setLayout(layoutc)
-        window_disease.setLayout(layoutd)
+        window_suitability.setLayout(layoutd)
         window_description.setLayout(layoute)
 
         layout1.addLayout(button_layout, stretch = 3)   #space taken by buttons in tabs bar
@@ -338,13 +420,13 @@ class MainWindow(qtw.QMainWindow):
         layout2.addWidget(window_basic)
         layout2.addWidget(window_contains)
         layout2.addWidget(window_diet)
-        layout2.addWidget(window_disease)
+        layout2.addWidget(window_suitability)
         layout2.addWidget(window_description)
 
         button_basic.clicked.connect(shift_basic)
         button_contains.clicked.connect(shift_contains)
         button_diet.clicked.connect(shift_diet)
-        button_disease.clicked.connect(shift_disease)
+        button_suitability.clicked.connect(shift_suitability)
         button_description.clicked.connect(shift_description)
 
         layout.addLayout(layout1, stretch = 1)       #space taken by content and tab bar
