@@ -1,44 +1,66 @@
 import PyQt6.QtWidgets as qtw
 
-class FoodDetails(qtw.QMainWindow):
+class SearchResults(qtw.QMainWindow):
     def __init__(self):
         super().__init__()
-        self.setWindowTitle("Food Details")
+        self.setWindowTitle("Search Page")
 
-        layout = qtw.QVBoxLayout()
+        main_layout = qtw.QVBoxLayout()
 
-        # Example 1: Apple
-        apple_group = qtw.QGroupBox("🍎 Apple")
-        apple_layout = qtw.QFormLayout()
-        apple_layout.addRow("Food Type:", qtw.QLabel("Veg"))
-        apple_layout.addRow("Calories:", qtw.QLabel("52 kcal / 100g"))
-        apple_layout.addRow("Best For:", qtw.QLabel("Morning, Snacks"))
-        apple_layout.addRow("Contains:", qtw.QLabel("Vitamin C, Fiber, Natural Sugar"))
-        apple_layout.addRow("Suitable For:", qtw.QLabel("✅ Heart, ❌ Diabetes"))
-        apple_layout.addRow("Description:", qtw.QLabel("A sweet, crunchy fruit rich in fiber and Vitamin C."))
-        apple_group.setLayout(apple_layout)
-        layout.addWidget(apple_group)
+        # --- Search bar ---
+        search_layout = qtw.QHBoxLayout()
+        self.search_input = qtw.QLineEdit()
+        self.search_input.setPlaceholderText("Search by Nutrient or Ingredient...")
+        search_button = qtw.QPushButton("Search")
+        search_button.clicked.connect(self.show_results)
+        search_layout.addWidget(self.search_input)
+        search_layout.addWidget(search_button)
+        main_layout.addLayout(search_layout)
 
-        # Example 2: Carrot
-        carrot_group = qtw.QGroupBox("🥕 Carrot")
-        carrot_layout = qtw.QFormLayout()
-        carrot_layout.addRow("Food Type:", qtw.QLabel("Veg"))
-        carrot_layout.addRow("Calories:", qtw.QLabel("41 kcal / 100g"))
-        carrot_layout.addRow("Best For:", qtw.QLabel("Lunch, Evening Snack"))
-        carrot_layout.addRow("Contains:", qtw.QLabel("Beta-Carotene, Fiber"))
-        carrot_layout.addRow("Suitable For:", qtw.QLabel("✅ Eyesight, ✅ Heart"))
-        carrot_layout.addRow("Description:", qtw.QLabel("A root vegetable high in beta-carotene, good for eyesight."))
-        carrot_group.setLayout(carrot_layout)
-        layout.addWidget(carrot_group)
+        # --- Fake filters (checkboxes just for show) ---
+        filters_group = qtw.QGroupBox("Filters")
+        filters_layout = qtw.QHBoxLayout()
+        filters_layout.addWidget(qtw.QCheckBox("Veg"))
+        filters_layout.addWidget(qtw.QCheckBox("Non-Veg"))
+        filters_layout.addWidget(qtw.QCheckBox("Egg"))
+        filters_layout.addWidget(qtw.QCheckBox("Low Calorie"))
+        filters_layout.addWidget(qtw.QCheckBox("Morning Snack"))
+        filters_group.setLayout(filters_layout)
+        main_layout.addWidget(filters_group)
+
+        # --- Results section ---
+        self.results_label = qtw.QLabel("Results will appear here...")
+        self.results_list = qtw.QListWidget()
+        main_layout.addWidget(self.results_label)
+        main_layout.addWidget(self.results_list)
 
         # finalize
         container = qtw.QWidget()
-        container.setLayout(layout)
+        container.setLayout(main_layout)
         self.setCentralWidget(container)
+
+    def show_results(self):
+        query = self.search_input.text().strip().lower()
+        self.results_list.clear()
+
+        if query == "vitamin c":
+            self.results_label.setText("🔍 Results for Nutrient: Vitamin C")
+            self.results_list.addItems([
+                "Apple (Rich in Vitamin C)",
+                "Orange (High Vitamin C content)"
+            ])
+        elif query == "apple":
+            self.results_label.setText("🔍 Results for Ingredient: Apple")
+            self.results_list.addItems([
+                "Apple Pie (contains Apple Flesh)",
+                "Fruit Salad (contains Apple Flesh)"
+            ])
+        else:
+            self.results_label.setText("No results found.")
 
 
 app = qtw.QApplication([])
-window = FoodDetails()
+window = SearchResults()
 window.show()
 app.exec()
 
