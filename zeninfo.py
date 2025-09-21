@@ -2,9 +2,10 @@ import PyQt6.QtWidgets as qtw
 from functools import partial
 
 class node:
-    def __init__(self, value, button, cbox = None, prev = None, after = None):
+    def __init__(self, value, button, number, cbox = None, prev = None, after = None):
         self.val = value
         self.button = button
+        self.num = number
         self.checkbox = cbox
         self.left = prev
         self.right = after
@@ -36,7 +37,7 @@ class MainWindow(qtw.QMainWindow):
         def create_text(num):
             if len(last_text[num].val.text()) != 0:
                 last_text[num].val.returnPressed.disconnect(functions[num])
-                last_text[num].right = node(qtw.QLineEdit(), qtw.QPushButton('-'))
+                last_text[num].right = node(qtw.QLineEdit(), qtw.QPushButton('-'), num)
                 last_text[num].right.left = last_text[num]
                 last_text[num] = last_text[num].right
                 text_layouts[num].addWidget(last_text[num].val)
@@ -49,9 +50,13 @@ class MainWindow(qtw.QMainWindow):
                 if num == 5:
                     last_text[5].checkbox = qtw.QCheckBox('Good')
                     disease_check.addWidget(last_text[5].checkbox)
-        def delete_text(num, button_id):
-            if last_text[num].left == None:return None
+        def delete_text(button_id):
             text = texts[button_id]
+            num = text.num
+            if last_text[num].left == None:
+                text.val.clear()
+                if num == 5:text.checkbox.setChecked(False)
+                return None
             if text.right == None:
                 last_text[num] = text.left
                 text.left.right = None
@@ -69,6 +74,23 @@ class MainWindow(qtw.QMainWindow):
             temp.setFixedHeight(0)
             temp.setFixedWidth(0)
             return temp
+        def clear():
+            quantitygroup.setExclusive(False)
+            basic_category.setExclusive(False)
+            name.clear()
+            veg.setChecked(False)
+            egg.setChecked(False)
+            nonveg.setChecked(False)
+            age_lower_limit.setValue(0)
+            age_upper_limit.setValue(0)
+            calories.setValue(0.0)
+            quantity.setValue(0.0)
+            gm.setChecked(False)
+            mg.setChecked(False)
+            description.clear()
+            quantitygroup.setExclusive(True)
+            basic_category.setExclusive(True)
+            for i in tuple(texts.keys()):delete_text(i)
 
         super().__init__()
         layout = qtw.QHBoxLayout() #master layout
@@ -91,6 +113,8 @@ class MainWindow(qtw.QMainWindow):
         button_contains = qtw.QPushButton('contains')
         button_diet = qtw.QPushButton('diet')
         button_suitability = qtw.QPushButton('suitablitiy')
+        button_submit = qtw.QPushButton('submit')
+        button_clear = qtw.QPushButton('clear')
         button_exit = qtw.QPushButton('exit')
 
         self.current_button = button_basic
@@ -103,7 +127,11 @@ class MainWindow(qtw.QMainWindow):
         button_layout.addWidget(button_contains)
         button_layout.addWidget(button_diet)
         button_layout.addWidget(button_suitability)
-        button_layout.addStretch(6)
+        button_layout.addStretch(2)
+        button_layout.addWidget(button_submit)
+        button_layout.addStretch(2)
+        button_layout.addWidget(button_clear)
+        button_layout.addStretch(4)
         button_layout.addWidget(button_exit)
         button_layout.addStretch(1)
 
@@ -115,6 +143,7 @@ class MainWindow(qtw.QMainWindow):
         layoutname.addStretch(1)
         layouta.addLayout(layoutname)
         layouta.addStretch(1)
+        category_widget = qtw.QWidget()
         category_layout = qtw.QHBoxLayout()
         category_order = qtw.QVBoxLayout()
         category_layout.addStretch(1)
@@ -130,7 +159,8 @@ class MainWindow(qtw.QMainWindow):
         category_order.addWidget(nonveg)
         category_layout.addLayout(category_order)
         category_layout.addStretch(1)
-        layouta.addLayout(category_layout)
+        category_widget.setLayout(category_layout)
+        layouta.addWidget(category_widget)
         layoutage = qtw.QHBoxLayout()
         layouta.addStretch(1)
         layoutage.addStretch(2)
@@ -163,6 +193,7 @@ class MainWindow(qtw.QMainWindow):
         quantity = qtw.QDoubleSpinBox()
         quantity.setMinimum(0)
         layoutquantity.addWidget(quantity)
+        quantity_widget = qtw.QWidget()
         quantityunit = qtw.QVBoxLayout()
         gm = qtw.QRadioButton('gms')
         mg = qtw.QRadioButton('mg')
@@ -171,7 +202,8 @@ class MainWindow(qtw.QMainWindow):
         quantitygroup.addButton(mg, 1)
         quantityunit.addWidget(gm)
         quantityunit.addWidget(mg)
-        layoutquantity.addLayout(quantityunit)
+        quantity_widget.setLayout(quantityunit)
+        layoutquantity.addWidget(quantity_widget)
         layoutquantity.addStretch(1)
         layouta.addLayout(layoutquantity)
         layouta.addStretch(1)
@@ -227,8 +259,8 @@ class MainWindow(qtw.QMainWindow):
         ingredient_text.addWidget(anchor())
         nutrient_button.addWidget(anchor())
         ingredient_button.addWidget(anchor())
-        last_text.append(node(qtw.QLineEdit(), qtw.QPushButton('-')))
-        last_text.append(node(qtw.QLineEdit(), qtw.QPushButton('-')))
+        last_text.append(node(qtw.QLineEdit(), qtw.QPushButton('-'), 0))
+        last_text.append(node(qtw.QLineEdit(), qtw.QPushButton('-'), 1))
         texts[0] = last_text[0]
         texts[1] = last_text[1]
         text_layouts.append(nutrient_text)
@@ -241,8 +273,8 @@ class MainWindow(qtw.QMainWindow):
         groups.append(qtw.QButtonGroup())
         groups[0].addButton(texts[0].button, 0)
         groups[1].addButton(texts[1].button, 1)
-        groups[0].idClicked.connect(partial(delete_text, 0))
-        groups[1].idClicked.connect(partial(delete_text, 1))
+        groups[0].idClicked.connect(delete_text)
+        groups[1].idClicked.connect(delete_text)
         texts[0].val.returnPressed.connect(functions[0])
         texts[1].val.returnPressed.connect(functions[1])
         nutrient_text.addWidget(texts[0].val)
@@ -311,9 +343,9 @@ class MainWindow(qtw.QMainWindow):
         bt_button.addWidget(anchor())
         diet_button.addWidget(anchor())
         btte_button.addWidget(anchor())
-        last_text.append(node(qtw.QLineEdit(), qtw.QPushButton('-')))
-        last_text.append(node(qtw.QLineEdit(), qtw.QPushButton('-')))
-        last_text.append(node(qtw.QLineEdit(), qtw.QPushButton('-')))
+        last_text.append(node(qtw.QLineEdit(), qtw.QPushButton('-'), 2))
+        last_text.append(node(qtw.QLineEdit(), qtw.QPushButton('-'), 3))
+        last_text.append(node(qtw.QLineEdit(), qtw.QPushButton('-'), 4))
         texts[2] = last_text[2]
         texts[3] = last_text[3]
         texts[4] = last_text[4]
@@ -332,9 +364,9 @@ class MainWindow(qtw.QMainWindow):
         groups[2].addButton(last_text[2].button, 2)
         groups[3].addButton(last_text[3].button, 3)
         groups[4].addButton(last_text[4].button, 4)
-        groups[2].idClicked.connect(partial(delete_text, 2))
-        groups[3].idClicked.connect(partial(delete_text, 3))
-        groups[4].idClicked.connect(partial(delete_text, 4))
+        groups[2].idClicked.connect(delete_text)
+        groups[3].idClicked.connect(delete_text)
+        groups[4].idClicked.connect(delete_text)
         last_text[2].val.returnPressed.connect(functions[2])
         last_text[3].val.returnPressed.connect(functions[3])
         last_text[4].val.returnPressed.connect(functions[4])
@@ -402,8 +434,8 @@ class MainWindow(qtw.QMainWindow):
         disease_button.addWidget(anchor())
         allergy_button.addWidget(anchor())
         disease_check.addWidget(anchor())
-        last_text.append(node(qtw.QLineEdit(), qtw.QPushButton('-'), qtw.QCheckBox('Good')))
-        last_text.append(node(qtw.QLineEdit(), qtw.QPushButton('-')))
+        last_text.append(node(qtw.QLineEdit(), qtw.QPushButton('-'), 5, qtw.QCheckBox('Good')))
+        last_text.append(node(qtw.QLineEdit(), qtw.QPushButton('-'), 6))
         texts[5] = last_text[5]
         texts[6] = last_text[6]
         text_layouts.append(disease_text)
@@ -414,8 +446,8 @@ class MainWindow(qtw.QMainWindow):
         functions.append(partial(create_text, 6))
         groups.append(qtw.QButtonGroup())
         groups.append(qtw.QButtonGroup())
-        groups[5].idClicked.connect(partial(delete_text, 5))
-        groups[6].idClicked.connect(partial(delete_text, 6))
+        groups[5].idClicked.connect(delete_text)
+        groups[6].idClicked.connect(delete_text)
         texts[5] = last_text[5]
         texts[6] = last_text[6]
         texts[5].val.returnPressed.connect(functions[5])
@@ -458,6 +490,7 @@ class MainWindow(qtw.QMainWindow):
         button_contains.clicked.connect(shift_contains)
         button_diet.clicked.connect(shift_diet)
         button_suitability.clicked.connect(shift_suitability)
+        button_clear.clicked.connect(clear)
 
         layout.addLayout(layout1, stretch = 1)       #space taken by content and tab bar
         layout.addLayout(layout2, stretch = 7)
