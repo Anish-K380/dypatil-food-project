@@ -33,11 +33,6 @@ class MainWindow(qtw.QMainWindow):
             turnwhite()
             self.current_button = button_suitability
             turnblue()
-        def shift_description():
-            layout2.setCurrentIndex(4)
-            turnwhite()
-            self.current_button = button_description
-            turnblue()
         def create_text(num):
             if len(last_text[num].val.text()) != 0:
                 last_text[num].val.returnPressed.disconnect(functions[num])
@@ -87,18 +82,15 @@ class MainWindow(qtw.QMainWindow):
         window_contains = qtw.QWidget()
         window_diet = qtw.QWidget()
         window_suitability = qtw.QWidget()
-        window_description = qtw.QWidget()
         layouta = qtw.QVBoxLayout()
         layoutb = qtw.QHBoxLayout()
         layoutc = qtw.QHBoxLayout()
         layoutd = qtw.QHBoxLayout()
-        layoute = qtw.QHBoxLayout()
 
         button_basic = qtw.QPushButton('basic')
         button_contains = qtw.QPushButton('contains')
         button_diet = qtw.QPushButton('diet')
         button_suitability = qtw.QPushButton('suitablitiy')
-        button_description = qtw.QPushButton('description')
         button_exit = qtw.QPushButton('exit')
 
         self.current_button = button_basic
@@ -111,12 +103,10 @@ class MainWindow(qtw.QMainWindow):
         button_layout.addWidget(button_contains)
         button_layout.addWidget(button_diet)
         button_layout.addWidget(button_suitability)
-        button_layout.addWidget(button_description)
         button_layout.addStretch(6)
         button_layout.addWidget(button_exit)
         button_layout.addStretch(1)
 
-        layouta.addStretch(2)
         layoutname = qtw.QHBoxLayout()
         layoutname.addStretch(1)
         layoutname.addWidget(qtw.QLabel('name:'))    #Basic page
@@ -124,6 +114,23 @@ class MainWindow(qtw.QMainWindow):
         layoutname.addWidget(name)
         layoutname.addStretch(1)
         layouta.addLayout(layoutname)
+        layouta.addStretch(1)
+        category_layout = qtw.QHBoxLayout()
+        category_order = qtw.QVBoxLayout()
+        category_layout.addStretch(1)
+        basic_category = qtw.QButtonGroup()
+        veg = qtw.QRadioButton('Veg')
+        nonveg = qtw.QRadioButton('Non-veg')
+        egg = qtw.QRadioButton('Egg')
+        basic_category.addButton(veg, 0)
+        basic_category.addButton(egg, 1)
+        basic_category.addButton(nonveg, 2)
+        category_order.addWidget(veg)
+        category_order.addWidget(egg)
+        category_order.addWidget(nonveg)
+        category_layout.addLayout(category_order)
+        category_layout.addStretch(1)
+        layouta.addLayout(category_layout)
         layoutage = qtw.QHBoxLayout()
         layouta.addStretch(1)
         layoutage.addStretch(2)
@@ -167,13 +174,22 @@ class MainWindow(qtw.QMainWindow):
         layoutquantity.addLayout(quantityunit)
         layoutquantity.addStretch(1)
         layouta.addLayout(layoutquantity)
+        layouta.addStretch(1)
+        description_layout = qtw.QHBoxLayout()
+        description_layout.addStretch(1)
+        description_layout.addWidget(qtw.QLabel('Description'))
+        description = qtw.QTextEdit()
+        description.setMinimumHeight(300)
+        description.setMinimumWidth(500)
+        description_layout.addWidget(description)
+        description_layout.addStretch(1)
+        layouta.addLayout(description_layout)
         next_button = qtw.QPushButton('next')
         next_button.clicked.connect(shift_contains)
         next_layout = qtw.QHBoxLayout()
         next_layout.addStretch(4)
         next_layout.addWidget(next_button)
         next_layout.addStretch(1)
-        layouta.addStretch(3)
         layouta.addLayout(next_layout)
         layouta.addStretch(2)
 
@@ -244,15 +260,15 @@ class MainWindow(qtw.QMainWindow):
         nutrient_layout.addStretch(4)
         ingredient_layout.addStretch(4)
         layoutb.addLayout(nutrient_layout)
-        layoutb.addStretch(9)
+        layoutb.addStretch(8)
         layoutb.addLayout(ingredient_layout)
         layoutb.addStretch(3)
         next_layout = qtw.QVBoxLayout()
-        next_layout.addStretch(83)
+        next_layout.addStretch(87)
         next_button = qtw.QPushButton('next')
         next_button.clicked.connect(shift_diet)
         next_layout.addWidget(next_button)
-        next_layout.addStretch(17)
+        next_layout.addStretch(13)
         layoutb.addLayout(next_layout)
         layoutb.addStretch(4)
 
@@ -346,6 +362,7 @@ class MainWindow(qtw.QMainWindow):
         layoutc.addLayout(bt_layout)
         layoutc.addLayout(diet_layout)
         layoutc.addLayout(btte_layout)
+        next_layout = 
         
         disease_layout = qtw.QVBoxLayout()
         allergy_layout = qtw.QVBoxLayout()
@@ -414,23 +431,10 @@ class MainWindow(qtw.QMainWindow):
         layoutd.addLayout(disease_layout)
         layoutd.addLayout(allergy_layout)
 
-        description_layout = qtw.QVBoxLayout()
-        description_layout.addWidget(qtw.QLabel('Description'))           #description page
-        description_layout.addStretch(1)
-        description = qtw.QTextEdit()
-        description.setMinimumHeight(300)
-        description.setMinimumWidth(500)
-        description_layout.addWidget(description)
-        description_layout.addStretch(3)
-        layoute.addStretch(1)
-        layoute.addLayout(description_layout)
-        layoute.addStretch(1)
-
         window_basic.setLayout(layouta)
         window_contains.setLayout(layoutb)
         window_diet.setLayout(layoutc)
         window_suitability.setLayout(layoutd)
-        window_description.setLayout(layoute)
 
         layout1.addLayout(button_layout, stretch = 3)   #space taken by buttons in tabs bar
         layout1.addLayout(layout1_, stretch = 1)
@@ -439,13 +443,11 @@ class MainWindow(qtw.QMainWindow):
         layout2.addWidget(window_contains)
         layout2.addWidget(window_diet)
         layout2.addWidget(window_suitability)
-        layout2.addWidget(window_description)
 
         button_basic.clicked.connect(shift_basic)
         button_contains.clicked.connect(shift_contains)
         button_diet.clicked.connect(shift_diet)
         button_suitability.clicked.connect(shift_suitability)
-        button_description.clicked.connect(shift_description)
 
         layout.addLayout(layout1, stretch = 1)       #space taken by content and tab bar
         layout.addLayout(layout2, stretch = 7)
