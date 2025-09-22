@@ -133,7 +133,7 @@ class MainWindow(qtw.QMainWindow):
                 container.append(str(int(element.checkbox.isChecked())))
                 element = element.left
             data.append(''.join(container))
-            with open('/home/anish/project/dypatil-food-project/zendata.csv', 'a') as file:
+            with open('zendata.csv', 'a') as file:
                 csvwriter = csv.writer(file)
                 csvwriter.writerow(data)
             clear()
