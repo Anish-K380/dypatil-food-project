@@ -1,5 +1,6 @@
 import PyQt6.QtWidgets as qtw
 from functools import partial
+import csv
 
 class node:
     def __init__(self, value, button, number, cbox = None, prev = None, after = None):
@@ -37,7 +38,7 @@ class MainWindow(qtw.QMainWindow):
         def create_text(num):
             if len(last_text[num].val.text()) != 0:
                 last_text[num].val.returnPressed.disconnect(functions[num])
-                last_text[num].right = node(qtw.QLineEdit(), qtw.QPushButton('-'), num)
+                last_text[num].right = node(qtw.QLineEdit(), qtw.QPushButton('X'), num)
                 last_text[num].right.left = last_text[num]
                 last_text[num] = last_text[num].right
                 text_layouts[num].addWidget(last_text[num].val)
@@ -47,6 +48,8 @@ class MainWindow(qtw.QMainWindow):
                 texts[self.button_id] = last_text[num]
                 groups[num].addButton(last_text[num].button, self.button_id)
                 self.button_id += 1
+                last_text[num].val.setMinimumWidth(200)
+                last_text[num].button.setMaximumWidth(50)
                 if num == 5:
                     last_text[5].checkbox = qtw.QCheckBox('Good')
                     disease_check.addWidget(last_text[5].checkbox)
@@ -75,7 +78,6 @@ class MainWindow(qtw.QMainWindow):
             temp.setFixedWidth(0)
             return temp
         def clear():
-            quantitygroup.setExclusive(False)
             basic_category.setExclusive(False)
             name.clear()
             veg.setChecked(False)
@@ -85,14 +87,64 @@ class MainWindow(qtw.QMainWindow):
             age_upper_limit.setValue(0)
             calories.setValue(0.0)
             quantity.setValue(0.0)
-            gm.setChecked(False)
-            mg.setChecked(False)
+            gm.setChecked(True)
             description.clear()
-            quantitygroup.setExclusive(True)
             basic_category.setExclusive(True)
             for i in tuple(texts.keys()):delete_text(i)
+        def name_error(error):
+            error_text.setText(errors[error])
+            error_header.show()
+            error_text.show()
+            button_error.show()
+            if error < 4:shift_basic()
+            elif error < 6:shift_contains()
+            return None
+        def hide_error():
+            error_header.hide()
+            error_text.hide()
+            button_error.hide()
+        def submit():
+            data = [name.text()]
+            if len(data[0]) == 0:return name_error(0)
+            if (veg.isChecked() or egg.isChecked() or nonveg.isChecked()):data.append(int(egg.isChecked()) + (int(nonveg.isChecked()) << 1))
+            else:return name_error(1)
+            data.append(age_lower_limit.value())
+            data.append(age_upper_limit.value())
+            if (data[3] == 0) or (data[2] > data[3]):data[2], data[3] = 0, 200
+            data.append(calories.value())
+            data.append(quantity.value())
+            if data[5] == 0:name_error(2)
+            data.append(int(mg.isChecked()))
+            data.append(description.toPlainText())
+            if len(data[7]) == 0:return name_error(3)
+            for i in range(7):
+                element = last_text[i]
+                container = list()
+                while element != None:
+                    container.append(element.val.text())
+                    if container[-1] == '':container.pop()
+                    element = element.left
+                data.append('`'.join(container))
+            if len(data[8]) == 0:name_error(4)
+            if len(data[9]) == 0:name_error(5)
+            element = last_text[5]
+            container = list()
+            while (element != None):
+                if len(element.val.text()) != 0:container.append(str(int(element.checkbox.isChecked())))
+                element = element.left
+            data.append(''.join(container))
+            clear()
+            shift_basic()
+        def example():
+            name.setText('Paneer Butter Masala')
+            veg.setChecked(True)
+            age_lower_limit_.setValue(0)
+            age_upper_limit.setValue(60)
+            calories.setValue(400)
+            description.setPlainText('Protein: 12 - 15 gms\nFat: 25 - 30 gms\nCarbohydrates: 10-15 gms\nFiber: 2-3 gms')
 
         super().__init__()
+        errors = ('Enter name', 'Select veg/egg/non-veg', 'Check quantity', 'Enter description', 'Fill nutrients', 'Fill ingredients', )
         layout = qtw.QHBoxLayout() #master layout
 
         layout1 = qtw.QVBoxLayout()  #contains buttons and open space
@@ -109,11 +161,26 @@ class MainWindow(qtw.QMainWindow):
         layoutc = qtw.QHBoxLayout()
         layoutd = qtw.QHBoxLayout()
 
+        button_example = qtw.QPushButton('example')
         button_basic = qtw.QPushButton('basic')
         button_contains = qtw.QPushButton('contains')
         button_diet = qtw.QPushButton('diet')
         button_suitability = qtw.QPushButton('suitablitiy')
         button_submit = qtw.QPushButton('submit')
+        error_header_layout = qtw.QHBoxLayout()
+        error_text_layout = qtw.QHBoxLayout()
+        error_header = qtw.QLabel('Error')
+        error_text = qtw.QLabel('')
+        error_header.hide()
+        error_text.hide()
+        error_header_layout.addStretch(1)
+        error_header_layout.addWidget(error_header)
+        error_header_layout.addStretch(1)
+        error_text_layout.addStretch(1)
+        error_text_layout.addWidget(error_text)
+        error_text_layout.addStretch(1)
+        button_error = qtw.QPushButton('OK')
+        button_error.hide()
         button_clear = qtw.QPushButton('clear')
         button_exit = qtw.QPushButton('exit')
 
@@ -122,6 +189,7 @@ class MainWindow(qtw.QMainWindow):
 
         button_exit.clicked.connect(app.quit)
 
+        button_layout.addWidget(button_example)
         button_layout.addStretch(1)
         button_layout.addWidget(button_basic)
         button_layout.addWidget(button_contains)
@@ -130,8 +198,12 @@ class MainWindow(qtw.QMainWindow):
         button_layout.addStretch(2)
         button_layout.addWidget(button_submit)
         button_layout.addStretch(2)
+        button_layout.addLayout(error_header_layout)
+        button_layout.addLayout(error_text_layout)
+        button_layout.addWidget(button_error)
+        button_layout.addStretch(2)
         button_layout.addWidget(button_clear)
-        button_layout.addStretch(4)
+        button_layout.addStretch(2)
         button_layout.addWidget(button_exit)
         button_layout.addStretch(1)
 
@@ -139,6 +211,7 @@ class MainWindow(qtw.QMainWindow):
         layoutname.addStretch(1)
         layoutname.addWidget(qtw.QLabel('name:'))    #Basic page
         name = qtw.QLineEdit()
+        name.setMinimumWidth(300)
         layoutname.addWidget(name)
         layoutname.addStretch(1)
         layouta.addLayout(layoutname)
@@ -182,6 +255,7 @@ class MainWindow(qtw.QMainWindow):
         layoutcalories.addStretch(1)
         layoutcalories.addWidget(qtw.QLabel('Calories:'))
         calories = qtw.QDoubleSpinBox()
+        calories.setMaximum(1000)
         layoutcalories.addWidget(calories)
         layoutcalories.addWidget(qtw.QLabel('kcal/100gm'))
         layoutcalories.addStretch(1)
@@ -191,13 +265,14 @@ class MainWindow(qtw.QMainWindow):
         layoutquantity.addStretch(1)
         layoutquantity.addWidget(qtw.QLabel('Ideal quantity per serving:'))
         quantity = qtw.QDoubleSpinBox()
-        quantity.setMinimum(0)
+        quantity.setMaximum(2000)
         layoutquantity.addWidget(quantity)
         quantity_widget = qtw.QWidget()
         quantityunit = qtw.QVBoxLayout()
         gm = qtw.QRadioButton('gms')
         mg = qtw.QRadioButton('mg')
         quantitygroup = qtw.QButtonGroup()
+        gm.setChecked(True)
         quantitygroup.addButton(gm, 0)
         quantitygroup.addButton(mg, 1)
         quantityunit.addWidget(gm)
@@ -259,8 +334,8 @@ class MainWindow(qtw.QMainWindow):
         ingredient_text.addWidget(anchor())
         nutrient_button.addWidget(anchor())
         ingredient_button.addWidget(anchor())
-        last_text.append(node(qtw.QLineEdit(), qtw.QPushButton('-'), 0))
-        last_text.append(node(qtw.QLineEdit(), qtw.QPushButton('-'), 1))
+        last_text.append(node(qtw.QLineEdit(), qtw.QPushButton('X'), 0))
+        last_text.append(node(qtw.QLineEdit(), qtw.QPushButton('X'), 1))
         texts[0] = last_text[0]
         texts[1] = last_text[1]
         text_layouts.append(nutrient_text)
@@ -343,9 +418,9 @@ class MainWindow(qtw.QMainWindow):
         bt_button.addWidget(anchor())
         diet_button.addWidget(anchor())
         btte_button.addWidget(anchor())
-        last_text.append(node(qtw.QLineEdit(), qtw.QPushButton('-'), 2))
-        last_text.append(node(qtw.QLineEdit(), qtw.QPushButton('-'), 3))
-        last_text.append(node(qtw.QLineEdit(), qtw.QPushButton('-'), 4))
+        last_text.append(node(qtw.QLineEdit(), qtw.QPushButton('X'), 2))
+        last_text.append(node(qtw.QLineEdit(), qtw.QPushButton('X'), 3))
+        last_text.append(node(qtw.QLineEdit(), qtw.QPushButton('X'), 4))
         texts[2] = last_text[2]
         texts[3] = last_text[3]
         texts[4] = last_text[4]
@@ -434,8 +509,8 @@ class MainWindow(qtw.QMainWindow):
         disease_button.addWidget(anchor())
         allergy_button.addWidget(anchor())
         disease_check.addWidget(anchor())
-        last_text.append(node(qtw.QLineEdit(), qtw.QPushButton('-'), 5, qtw.QCheckBox('Good')))
-        last_text.append(node(qtw.QLineEdit(), qtw.QPushButton('-'), 6))
+        last_text.append(node(qtw.QLineEdit(), qtw.QPushButton('X'), 5, qtw.QCheckBox('Good')))
+        last_text.append(node(qtw.QLineEdit(), qtw.QPushButton('X'), 6))
         texts[5] = last_text[5]
         texts[6] = last_text[6]
         text_layouts.append(disease_text)
@@ -478,6 +553,10 @@ class MainWindow(qtw.QMainWindow):
         window_diet.setLayout(layoutc)
         window_suitability.setLayout(layoutd)
 
+        for i in range(7):
+            last_text[i].val.setMinimumWidth(200)
+            last_text[i].button.setMaximumWidth(50)
+
         layout1.addLayout(button_layout, stretch = 3)   #space taken by buttons in tabs bar
         layout1.addLayout(layout1_, stretch = 1)
 
@@ -486,11 +565,14 @@ class MainWindow(qtw.QMainWindow):
         layout2.addWidget(window_diet)
         layout2.addWidget(window_suitability)
 
+        button_example.clicked.connect(example)
         button_basic.clicked.connect(shift_basic)
         button_contains.clicked.connect(shift_contains)
         button_diet.clicked.connect(shift_diet)
         button_suitability.clicked.connect(shift_suitability)
+        button_error.clicked.connect(hide_error)
         button_clear.clicked.connect(clear)
+        button_submit.clicked.connect(submit)
 
         layout.addLayout(layout1, stretch = 1)       #space taken by content and tab bar
         layout.addLayout(layout2, stretch = 7)
