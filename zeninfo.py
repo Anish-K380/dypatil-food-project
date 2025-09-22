@@ -133,7 +133,7 @@ class MainWindow(qtw.QMainWindow):
                 container.append(str(int(element.checkbox.isChecked())))
                 element = element.left
             data.append(''.join(container))
-            with open('zendata.csv', 'a') as file:
+            with open(filepath, 'a') as file:
                 csvwriter = csv.writer(file)
                 csvwriter.writerow(data)
             clear()
@@ -159,6 +159,7 @@ class MainWindow(qtw.QMainWindow):
                 element = element.left
 
         super().__init__()
+        with open('zendatapath.txt', 'r') as file:filepath = file.read() + '/zendata.csv'
         errors = ('Enter name', 'Select veg/egg/non-veg', 'Check quantity', 'Enter description', 'Fill nutrients', 'Fill ingredients', )
         layout = qtw.QHBoxLayout() #master layout
 
