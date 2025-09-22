@@ -13,8 +13,8 @@ class node:
 
 class MainWindow(qtw.QMainWindow):
     def __init__(self):
-        def turnwhite():self.current_button.setStyleSheet('background-color: white;')
-        def turnblue():self.current_button.setStyleSheet('background-color: lightblue;')
+        def turnwhite():self.current_button.setStyleSheet('background-color: #3c3c3c;')
+        def turnblue():self.current_button.setStyleSheet('background-color: purple;')
         def shift_basic():
             layout2.setCurrentIndex(0)
             turnwhite()
