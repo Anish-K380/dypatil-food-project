@@ -130,18 +130,30 @@ class MainWindow(qtw.QMainWindow):
             element = last_text[5]
             container = list()
             while (element != None):
-                if len(element.val.text()) != 0:container.append(str(int(element.checkbox.isChecked())))
+                container.append(str(int(element.checkbox.isChecked())))
                 element = element.left
             data.append(''.join(container))
             clear()
             shift_basic()
         def example():
+            clear()
             name.setText('Paneer Butter Masala')
             veg.setChecked(True)
-            age_lower_limit_.setValue(0)
+            age_lower_limit.setValue(6)
             age_upper_limit.setValue(60)
             calories.setValue(400)
-            description.setPlainText('Protein: 12 - 15 gms\nFat: 25 - 30 gms\nCarbohydrates: 10-15 gms\nFiber: 2-3 gms')
+            quantity.setValue(200)
+            description.setPlainText('Soft paneer cubes in a creamy tomato gravy, richin proten and calcium. A flavorful choice for growing children, active adults, and post-workout meals. Enjoy in modration as part of a balanced diet.\n\nMay contain nuts as part of improving taste quality.')
+            elements = (('protein', 'fat', 'calcium'), ('paneer', 'tomatoes', 'butter', 'cream'), ('lean', 'medium', 'growing children', 'adoloscents'), ('muscle building', 'office lifestyle', 'gym'), ('lunch', 'dinner', 'post-workout'), ('heart issues', 'obesity', 'digestive disorder', 'underweight', 'malnutrition', 'protein deficiency', 'osteoporosis'), ('lactose intolerance',))
+            for i in range(7):
+                for j in range(len(elements[i])):
+                    last_text[i].val.setText(elements[i][j])
+                    create_text(i)
+                delete_text(self.button_id - 1)
+            element = last_text[5]
+            for i in range(4):
+                element.checkbox.setChecked(True)
+                element = element.left
 
         super().__init__()
         errors = ('Enter name', 'Select veg/egg/non-veg', 'Check quantity', 'Enter description', 'Fill nutrients', 'Fill ingredients', )
